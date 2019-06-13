@@ -814,14 +814,14 @@ function scormLog() {
         var label = args.shift();
         var ts = "<fieldset><legend>" + [h<10?"0"+h:h,m<10?"0"+m:m,s<10?"0"+s:s," "].join(":") + " " + label + "</legend>";
         var el = document.createElement("div");
-        var args = [].map.call(args, function(argument,index) {
+        var outp = [].map.call(args, function(argument,index) {
             return (typeof argument === 'object')
                     ? JSON.stringify(argument)
                     : typeof argument === 'undefined'
                     ? ""
                     : argument.toString();
         });
-        el.innerHTML = ts + args.join("<hr>") + "</fieldset>";
+        el.innerHTML = ts + outp.join("<hr>") + "</fieldset>";
         output.insertAdjacentElement('afterbegin', el);
     }
 }
@@ -836,7 +836,7 @@ function scormLog() {
         </div>
         <div>
             <button onclick="console.log('simulate load');document.getElementById('scorm_object').setAttribute('src','<?php echo $source; ?>');__global__termsco__hasrun=false;return false;">Simulate load</button>
-            <button onclick="console.log('simulate unload');document.getElementById('scorm_object').setAttribute('src','about:blank');setTimeout(function(){scormLog("API InternalState", API.internalState)},5000);DoRequest(null, 'unloaded', ''); return false;">Simulate unload</button>
+            <button onclick="console.log('simulate unload');document.getElementById('scorm_object').setAttribute('src','about:blank');setTimeout(function(){scormLog('API InternalState', API.internalState)},5000);DoRequest(null, 'unloaded', ''); return false;">Simulate unload</button>
             <button onclick="console.log('call lms commit');API.LMSCommit()">Perform LMS Commit</button>
             <button onclick="addMarker()">Add log marker</button>
             <button onclick="clearLog()">Clear Log</button>
