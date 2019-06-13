@@ -12,6 +12,18 @@ function delTree($dir) {
     return rmdir($dir);
 }
 
+if (isset($_GET["delink"])) {
+    $unlink = $_GET["delink"];
+    delTree( __DIR__ . "/$unlink" );
+    $path = getcwd();
+    $zip = $path . '/' . $unlink . '.zip';
+    if (file_exists($zip)) {
+        unlink($zip);
+    }
+    header("location: index.php");
+    die();
+}
+
 if (isset($_GET["unlink"])) {
     $unlink = $_GET["unlink"];
     delTree( __DIR__ . "/$unlink" );
@@ -74,7 +86,8 @@ foreach($filelist as $file) {
 
 // list all packages that have scorm
 //TODO: fix - read manifest to get start page
-$directories = array_diff(scandir($target), array('..', '.'));
+$directories = array_diff(scandir($target), array('..', '.', '.git','2012','2013','2014','2015','2016','2017','2018','2019','2020')); // cheaty but works
+natcasesort($directories);
 foreach ($directories as $value) {
     if (is_dir($target . '/' . $value)) {
         $t = preg_replace("/[^a-zA-Z]/", "", $value);
@@ -82,6 +95,7 @@ foreach ($directories as $value) {
         if (file_exists("$value/imsmanifest.xml")) {
 
             $manifest = file_get_contents("$value/imsmanifest.xml");
+            $manifest = str_replace("adlcp:", "", $manifest); // imscp packages may have un-namespaced prefixes
             $xmlDoc = simplexml_load_string ($manifest);
             $i = $value . "/" . $xmlDoc->resources[0]->resource[0]->attributes()->href;
 
@@ -109,9 +123,9 @@ foreach ($directories as $value) {
 
         }
         echo "<tr><td>$value</td>";
-        echo "<td><a href='12.html?$i' target='sco12$t'>Launch</a></td>";
+        echo "<td><a href='12.php?$i' target='sco12$t'>Launch</a></td>";
         echo "<td><a href='2004.html?&sco=$i' target='sco2004$t'>Launch</a></td>";
-        echo "<td><a href='index.php?unlink=" . urlencode($value) . "'>Delete</a></td>";
+        echo "<td><a href='index.php?unlink=" . urlencode($value) . "'>Delete</a> (<a href='index.php?delink=" . urlencode($value) . "'>+ Zip</a>)</td>";
         echo "</tr>";
     }
 }
